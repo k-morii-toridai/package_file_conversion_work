@@ -1,3 +1,5 @@
+""" This module is written for convert POSCAR.nnlist to pd.DataFrame. """
+
 import pandas as pd
 # 表示オプションを設定
 pd.set_option('display.float_format', '{:.6f}'.format)
