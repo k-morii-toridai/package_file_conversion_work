@@ -3,36 +3,31 @@ import pandas as pd
 pd.set_option('display.float_format', '{:.6f}'.format)
 
 
+def nnlist2df(nnlist_path='POSCAR.nnlist'):
+    """
+    This func converts POSCAR.nnlist to pd.DataFrame.
 
-def nnlist2df(POSCAR_nnlist='POSCAR.nnlist'): 
-    
-    # CSVファイルに書き込むためのファイルを作成
-    output_csv_fname = POSCAR_nnlist + '.csv'
-    
-    def nnlist2csv(POSCAR_nnlist='POSCAR.nnlist'):
-        # テキストファイルの内容を読み込みます
-        with open(POSCAR_nnlist, 'r') as input_file:
-            lines = input_file.readlines()
+    Usage:
+    -------
+    df_nnlist = nnlist2df(nnlist_path='POSCAR.nnlist')
 
-        # # CSVファイルに書き込むためのファイルを開きます
-        # output_csv_fname = POSCAR_nnlist + '.csv'
-        with open(output_csv_fname, 'w') as output_file:
-            # CSVヘッダを書き込みます
-            output_file.write("central atom,neighboring atom,distance,X,Y,Z,unitcell_x,unitcell_y,unitcell_z,central species,neighboring species\n")
+    Parameter:
+    ------------
+    nnlist_path: str or pathlib.Path
 
-            # テキストファイルの各行を処理します
-            for line in lines:
-                # スペースで区切られた各要素を取得します
-                elements = line.split()
+    Return:
+    -------
+    pd.DataFrame
+    """
 
-                # CSV行を構築します
-                csv_line = ','.join(elements[:11]) + '\n'
+    # データを読み込みます。列名を指定し、区切り文字として空白を指定します。
+    df = pd.read_csv(nnlist_path, sep='\\s+', header=None)
+    # 列名を設定します。
+    df.columns = ["central_atom_id", "neighboring_atom_id", "rel_distance", "rel_x", "rel_y", "rel_z",
+                  "unitcell_x", "unitcell_y", "unitcell_z", "central_atom_symbol", "neighboring_atom_symbol"]
+    # cast int64 to str for central_atom_id column
+    df['central_atom_id'] = df['central_atom_id'].astype(str)
+    # cast int64 to str for neighboring_atom_id column
+    df['neighboring_atom_id'] = df['neighboring_atom_id'].astype(str)
 
-                # CSVファイルに書き込みます
-                output_file.write(csv_line)
-
-    # nnlistを変換したcsvファイルを作成
-    nnlist2csv(POSCAR_nnlist)
-    df_nnlist = pd.read_csv(output_csv_fname)    
-    
-    return df_nnlist
+    return df
